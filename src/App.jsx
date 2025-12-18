@@ -9,6 +9,7 @@ export default function App() {
   const [tasks, setTasks] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
+  const [weather, setWeather] = useState(null);
   const [statusFilter, setStatusFilter] = useState("All");  
   const [priorityFilter, setPriorityFilter] = useState("All");
   const [draftTask, setDraftTask] = useState(null);
@@ -16,6 +17,29 @@ export default function App() {
     const updated = { ...taskObject, completed: false };
     setTasks([...tasks, updated]);
   };
+
+  useEffect(() => {
+    async function fetchWeather() {
+      const API_KEY = "fbf90ff022271b7e9842eff74fc009bb"; // replace with your OpenWeatherMap key
+      const city = "Houston";
+      const res = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}`
+      );
+      const data = await res.json();
+      console.log(data)
+  
+      // Convert Kelvin → Celsius
+      const tempC = Math.round(data.main.temp - 273.15);
+  
+      setWeather({
+        city: data.name,
+        temp: tempC,
+        condition: data.weather[0].main,
+      });
+    }
+  
+    fetchWeather();
+  }, []);
 
   const filteredTasks = tasks.filter((task) => {
     const statusMatch =
@@ -32,7 +56,12 @@ export default function App() {
   return (
     <div className="min-h-screen">
       <header className="h-48 bg-red-600 shadow-md flex items-center justify-center">
-        <h1 className="text-5xl font-bold text-white">Todo App 🚀</h1>
+        <h1 className="text-5xl font-bold text-white">Todo ApJp 🚀 </h1>
+            {weather && (
+        <div className="text-white text-lg font-semibold">
+          🌤️ {weather.temp}°C | {weather.city}
+        </div>
+      )}
       </header>
 
       {/* Add Task Button */}
